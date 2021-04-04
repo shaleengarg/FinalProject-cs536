@@ -1,0 +1,79 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\catcode 95\active
+\providecommand \oddpage@label [2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Threads running concurrently can lead to unexpected results\relax }}{1}{figure.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{1}{section.2}\protected@file@percent }
+\newlabel{sec:background}{{2}{1}{Background}{section.2}{}}
+\newlabel{sec:background@cref}{{[section][2][]2}{[1][1][]1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Detecting Shared Data Structure}{1}{subsection.2.1}\protected@file@percent }
+\citation{LLVM}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Program showing the difficulty in using pointers for tracing shared objects\relax }}{2}{figure.caption.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Protecting Memory Objects}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Source Code Compliance}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Our Design and Implementation}{2}{section.3}\protected@file@percent }
+\newlabel{sec:design}{{3}{2}{Our Design and Implementation}{section.3}{}}
+\newlabel{sec:design@cref}{{[section][3][]3}{[1][2][]2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Lock: Typical Critical Section\relax }}{2}{figure.caption.3}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:TypicalLockSem}{{3}{2}{Lock: Typical Critical Section\relax }{figure.caption.3}{}}
+\newlabel{fig:TypicalLockSem@cref}{{[figure][3][]3}{[1][2][]2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Lock\&Perm: New Lock Semantics\relax }}{2}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:ChangedLockSem}{{4}{2}{Lock\&Perm: New Lock Semantics\relax }{figure.caption.3}{}}
+\newlabel{fig:ChangedLockSem@cref}{{[figure][4][]4}{[1][2][]2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}High-Level Architecture}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Correct semaphore usage but failure to enable write protection\relax }}{3}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:lockonly}{{5}{3}{Correct semaphore usage but failure to enable write protection\relax }{figure.caption.4}{}}
+\newlabel{fig:lockonly@cref}{{[figure][5][]5}{[1][3][]3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces No semaphore usage with the PKRU updates\relax }}{3}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:pkeyonly}{{6}{3}{No semaphore usage with the PKRU updates\relax }{figure.caption.4}{}}
+\newlabel{fig:pkeyonly@cref}{{[figure][6][]6}{[1][3][]3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Using neither semaphore nor write protection\relax }}{3}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:NoneUsed}{{7}{3}{Using neither semaphore nor write protection\relax }{figure.caption.4}{}}
+\newlabel{fig:NoneUsed@cref}{{[figure][7][]7}{[1][3][]3}}
+\newlabel{fig:ErrorSemantics}{{\caption@xref {fig:ErrorSemantics}{ on input line 91}}{3}{High-Level Architecture}{figure.caption.4}{}}
+\newlabel{fig:ErrorSemantics@cref}{{[subsection][1][3]3.1}{[1][3][]3}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Define a Shared Object\relax }}{3}{algorithm.1}\protected@file@percent }
+\newlabel{algo:DefineSharedObj}{{1}{3}{Define a Shared Object\relax }{algorithm.1}{}}
+\newlabel{algo:DefineSharedObj@cref}{{[algorithm][1][]1}{[1][3][]3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Implementation Details}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Define a shared object}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Define a Critical Section}{3}{algorithm.1}\protected@file@percent }
+\citation{libmpk}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Design of our library for transactional systems. We ensure incorrect lock semantics result in a page fault at runtime.\relax }}{4}{figure.caption.5}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Wrapper: Critical Section\relax }}{4}{algorithm.2}\protected@file@percent }
+\newlabel{algo:DefineCriticalSection}{{2}{4}{Wrapper: Critical Section\relax }{algorithm.2}{}}
+\newlabel{algo:DefineCriticalSection@cref}{{[algorithm][2][]2}{[1][3][]4}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Evaluation and Limitations}{4}{section.4}\protected@file@percent }
+\newlabel{sec:eval}{{4}{4}{Evaluation and Limitations}{section.4}{}}
+\newlabel{sec:eval@cref}{{[section][4][]4}{[1][3][]4}}
+\@writefile{toc}{\contentsline {paragraph}{Atomicity}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Consistency}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Isolation}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Durability}{4}{section.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Change in source code needed by the programmer\relax }}{4}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:SourceChange}{{9}{4}{Change in source code needed by the programmer\relax }{figure.caption.6}{}}
+\newlabel{fig:SourceChange@cref}{{[figure][9][]9}{[1][4][]4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Limitations}{4}{subsection.4.1}\protected@file@percent }
+\bibstyle{plain}
+\bibdata{main}
+\bibcite{LLVM}{1}
+\bibcite{libmpk}{2}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{5}{section.5}\protected@file@percent }
