@@ -1,0 +1,42 @@
+node {
+    currentBuild.displayName = "#${BUILD_NUMBER} ${JOB_NAME} on ${NODE_NAME}"
+    // currentBuild.description = "${NODE_NAME}"
+}
+
+pipeline {
+    agent any
+
+    triggers {
+        pollSCM('* * * * *')    // poll SCM for changes every minute
+    }
+
+    options {
+        skipStagesAfterUnstable()
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh './setup.sh'
+                sh './build.sh'
+            }
+        }
+        stage('Test'){
+            steps {
+                sh './test.sh'
+            }
+        }
+        stage('Experiments'){
+            steps {
+                sh 'echo "Run Experiments"'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'src/shim.so', fingerprint: true
+        }
+    }
+}
+
