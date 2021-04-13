@@ -35,14 +35,11 @@ static void dest() __attribute__((destructor));
 
 
 void con(){
-    printf("init tracing...\n");
-
     open_sem();
 }
 
 
 void dest(){
-    printf("application termination...\n");
 }
 
 
