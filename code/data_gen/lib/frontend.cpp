@@ -55,9 +55,6 @@ FILE *fopen(const char *filename, const char *mode){
 
     int fd = fileno(ret);
 
-
-    printf("%s: PID:%d - %s -> %d\n", __func__, getpid(), filename, fd);
-
     if(reg_file(ret)){
         handle_open(fd, filename);
     }
@@ -67,8 +64,6 @@ FILE *fopen(const char *filename, const char *mode){
 
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
-
-    //printf("hello_fread, fd:%d\n", fileno(stream));
 
     // Perform the actual system call
     size_t amount_read = real_fread(ptr, size, nmemb, stream);
@@ -93,7 +88,6 @@ ssize_t read(int fd, void *data, size_t size){
 
 #ifdef PREDICTOR
     if(reg_fd(fd)){
-        //printf("fd: %d lseek: %ld bytes: %lu\n", fd, lseek(fd, 0, SEEK_CUR), size );
         handle_read(fd, lseek(fd, 0, SEEK_CUR), size);
     }
 #endif
@@ -118,26 +112,11 @@ ssize_t write(int fd, const void *data, size_t size){
 
 int fclose(FILE *stream){
     int fd = fileno(stream);
-    printf("%s PID:%d fd:%d\n", __func__, getpid(), fd);
-#ifdef PREDICTOR
-    if(reg_file(stream)){
-        handle_close(fd);
-    }
-#endif
     return real_fclose(stream);
 }
 
 
 int close(int fd){
-    printf("File close detected\n");
-
-#ifdef PREDICTOR
-    if(reg_fd(fd)){
-        //remove from the predictor data
-        handle_close(fd);
-    }
-#endif
-
     return real_close(fd);
 }
 
