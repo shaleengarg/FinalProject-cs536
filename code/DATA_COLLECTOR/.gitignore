@@ -1,9 +1,0 @@
-*.DS_Store
-*.swp
-*cscope.out
-*rocksdata
-DATA_RESTART.*
-history.out
-history_restart.out
-sheareb.out
-sheareb_restart.out
