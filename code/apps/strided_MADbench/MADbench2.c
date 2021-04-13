@@ -123,17 +123,13 @@ int main(int argc, char** argv)
 
     initialize(argc, argv); PMPI_Barrier(MPI_COMM_WORLD);
 
-    printf("build_S\n");
     build_S(); PMPI_Barrier(MPI_COMM_WORLD);
-    printf("build_S done\n");
 
 #ifndef IO
     invert_D(); PMPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-    printf("calc_W\n");
     calc_W(); PMPI_Barrier(MPI_COMM_WORLD);
-    printf("calc_W done\n");
 
     calc_dC(); PMPI_Barrier(MPI_COMM_WORLD);
 
