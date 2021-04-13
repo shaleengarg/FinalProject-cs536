@@ -35,12 +35,14 @@ static void dest() __attribute__((destructor));
 
 
 void con(){
-    debug_print("init tracing...\n");
+    printf("init tracing...\n");
+
+    open_sem();
 }
 
 
 void dest(){
-    debug_print("application termination...\n");
+    printf("application termination...\n");
 }
 
 
@@ -54,7 +56,7 @@ FILE *fopen(const char *filename, const char *mode){
     int fd = fileno(ret);
 
 
-    debug_print("%s: PID:%d - %s -> %d\n", __func__, getpid(), filename, fd);
+    printf("%s: PID:%d - %s -> %d\n", __func__, getpid(), filename, fd);
 
     if(reg_file(ret)){
         handle_open(fd, filename);
@@ -66,7 +68,7 @@ FILE *fopen(const char *filename, const char *mode){
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
 
-    //debug_print("hello_fread, fd:%d\n", fileno(stream));
+    //printf("hello_fread, fd:%d\n", fileno(stream));
 
     // Perform the actual system call
     size_t amount_read = real_fread(ptr, size, nmemb, stream);
@@ -116,7 +118,7 @@ ssize_t write(int fd, const void *data, size_t size){
 
 int fclose(FILE *stream){
     int fd = fileno(stream);
-    debug_print("%s PID:%d fd:%d\n", __func__, getpid(), fd);
+    printf("%s PID:%d fd:%d\n", __func__, getpid(), fd);
 #ifdef PREDICTOR
     if(reg_file(stream)){
         handle_close(fd);
@@ -127,7 +129,7 @@ int fclose(FILE *stream){
 
 
 int close(int fd){
-    debug_print("File close detected\n");
+    printf("File close detected\n");
 
 #ifdef PREDICTOR
     if(reg_fd(fd)){
@@ -155,29 +157,29 @@ bool reg_fd(int fd)
     if(fstat(fd, &st) == 0){
         switch (st.st_mode & S_IFMT) {
            case S_IFBLK:
-               debug_print("fd:%d block device\n", fd);
+               printf("fd:%d block device\n", fd);
                break;
            case S_IFCHR:
-               debug_print("fd:%d character device\n", fd);
+               printf("fd:%d character device\n", fd);
                break;
            case S_IFDIR:
-               debug_print("fd:%d directory\n", fd);
+               printf("fd:%d directory\n", fd);
                break;
            case S_IFIFO:
-               debug_print("fd:%d FIFO/pipe\n", fd);
+               printf("fd:%d FIFO/pipe\n", fd);
                break;
            case S_IFLNK:
-               debug_print("fd:%d symlink\n", fd);
+               printf("fd:%d symlink\n", fd);
                break;
            case S_IFREG:
-               debug_print("fd:%d regular file\n", fd); 
+               printf("fd:%d regular file\n", fd); 
                return true;            
                break;
            case S_IFSOCK:
-               debug_print("fd:%d socket\n", fd);
+               printf("fd:%d socket\n", fd);
                break;
            default:
-               debug_print("fd:%d unknown?\n", fd);
+               printf("fd:%d unknown?\n", fd);
            }
         /*
         if(S_ISREG(st.st_mode)){
