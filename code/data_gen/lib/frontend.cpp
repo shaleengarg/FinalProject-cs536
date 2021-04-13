@@ -40,6 +40,7 @@ void con(){
 
 
 void dest(){
+    dest_sem();
 }
 
 

@@ -8,6 +8,7 @@ int handle_close(int fd);
 bool open_sem();
 bool get_sem();
 bool post_sem();
+bool dest_sem();
 bool write_log(int type, pid_t pid, int fd, off_t offset, size_t bytes);
 #endif
 
