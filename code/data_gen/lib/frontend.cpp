@@ -68,7 +68,6 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
     // Perform the actual system call
     size_t amount_read = real_fread(ptr, size, nmemb, stream);
 
-#ifdef PREDICTOR
     int fd = fileno(stream); 
 
     if(reg_file(stream)){ //this is a regular file
@@ -76,7 +75,6 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
         
         handle_read(fd, ftell(stream), size*nmemb);
     }
-#endif
 
     return amount_read;
 }
@@ -86,11 +84,9 @@ ssize_t read(int fd, void *data, size_t size){
 
     ssize_t amount_read = real_read(fd, data, size);
 
-#ifdef PREDICTOR
     if(reg_fd(fd)){
         handle_read(fd, lseek(fd, 0, SEEK_CUR), size);
     }
-#endif
 
     return amount_read;
 }
@@ -100,12 +96,21 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream){
     // Perform the actual system call
     size_t amount_written = real_fwrite(ptr, size, nmemb, stream);
 
+    int fd = fileno(stream); 
+    if(reg_file(stream)){ //this is a regular file
+        handle_write(fd, ftell(stream), size*nmemb);
+    }
+
     return amount_written;
 }
 
 
 ssize_t write(int fd, const void *data, size_t size){
     ssize_t amount_written = real_write(fd, data, size);
+
+    if(reg_fd(fd)){
+        handle_write(fd, lseek(fd, 0, SEEK_CUR), size);
+    }
     return amount_written;
 }
 

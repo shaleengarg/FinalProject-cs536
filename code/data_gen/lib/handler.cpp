@@ -15,7 +15,7 @@
 
 sem_t   *mysemp;
 const char semname[] = "mysem";
-const char logname[] = "log";
+const char logname[] = "/usr/temp/log-madbench";
 
 
 /* Keeps track of all filenames wrt its corresponding fd*/
@@ -83,7 +83,14 @@ bool write_log(int type, pid_t pid, int fd, off_t offset, size_t bytes){
     FILE * fp;
     fp = fopen (logname, "a");
 
-    fprintf(fp, "%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
+    if(fp == NULL)
+    {
+        printf("Unable to open file\n");
+        return -1;
+    }
+
+    //fprintf(fp, "%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
+    printf("%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
             type, pid, fd, offset, bytes);
 
     fclose(fp);
