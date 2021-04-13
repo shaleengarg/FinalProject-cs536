@@ -15,19 +15,7 @@
 
 sem_t   *mysemp;
 const char semname[] = "mysem";
-const char logname[] = "/usr/temp/log-madbench";
-
-
-/* Keeps track of all filenames wrt its corresponding fd*/
-std::unordered_map<int, std::string> fd_to_filename;
-
-bool handle_open(int fd, const char *filename){
-
-    if(fd<=2 || filename == NULL)
-        return false;
-
-    return true;
-}
+const char logname[] = "log-madbench";
 
 
 int handle_read(int fd, off_t pos, size_t bytes) {
@@ -52,10 +40,6 @@ int handle_write(int fd, off_t pos, size_t bytes){
     return true;
 }
 
-
-int handle_close(int fd){
-    return true;
-}
 
 bool open_sem(){
     mysemp = sem_open(semname, O_CREAT, 0666, 1);
@@ -89,8 +73,7 @@ bool write_log(int type, pid_t pid, int fd, off_t offset, size_t bytes){
         return -1;
     }
 
-    //fprintf(fp, "%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
-    printf("%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
+    fprintf(fp, "%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
             type, pid, fd, offset, bytes);
 
     fclose(fp);

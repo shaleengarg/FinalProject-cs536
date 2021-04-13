@@ -46,23 +46,6 @@ void dest(){
 }
 
 
-FILE *fopen(const char *filename, const char *mode){
-
-    FILE *ret;
-    ret = real_fopen(filename, mode);
-    if(!ret)
-        return ret;
-
-    int fd = fileno(ret);
-
-    if(reg_file(ret)){
-        handle_open(fd, filename);
-    }
-
-    return ret;
-}
-
-
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
 
     // Perform the actual system call
@@ -115,16 +98,6 @@ ssize_t write(int fd, const void *data, size_t size){
 }
 
 
-int fclose(FILE *stream){
-    int fd = fileno(stream);
-    return real_fclose(stream);
-}
-
-
-int close(int fd){
-    return real_close(fd);
-}
-
 //returns fd if  FILE is a regular file
 int reg_file(FILE *stream){
     return reg_fd(fileno(stream));
@@ -141,36 +114,23 @@ bool reg_fd(int fd)
     if(fstat(fd, &st) == 0){
         switch (st.st_mode & S_IFMT) {
            case S_IFBLK:
-               printf("fd:%d block device\n", fd);
                break;
            case S_IFCHR:
-               printf("fd:%d character device\n", fd);
                break;
            case S_IFDIR:
-               printf("fd:%d directory\n", fd);
                break;
            case S_IFIFO:
-               printf("fd:%d FIFO/pipe\n", fd);
                break;
            case S_IFLNK:
-               printf("fd:%d symlink\n", fd);
                break;
            case S_IFREG:
-               printf("fd:%d regular file\n", fd); 
                return true;            
                break;
            case S_IFSOCK:
-               printf("fd:%d socket\n", fd);
                break;
            default:
                printf("fd:%d unknown?\n", fd);
            }
-        /*
-        if(S_ISREG(st.st_mode)){
-            return true;
-        }
-        */
     }
-    //return true;
     return false;
 }
