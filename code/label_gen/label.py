@@ -24,7 +24,7 @@ nr_windows= int((nr_lines-1)/100)
 def write_outfile(line, label):
     try:
         f = open(outfilename, "a")
-        outline = line + DELIM + label + "\n"
+        outline = line.strip('\n') + DELIM + label + "\n"
         f.write(outline)
 
     except IOError:
