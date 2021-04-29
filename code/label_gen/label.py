@@ -55,9 +55,9 @@ def main():
         for j in range(start, end):
             line = filecontent[j].split(DELIM)
             if(check_access(line[2], line[3], end, LOOKAHEAD*WINDOW) == True):
-                write_outfile(line, "0")
+                write_outfile(filecontent[j], "0")
             else:
-                write_outfile(line, "1")
+                write_outfile(filecontent[j], "1")
 
 
 if __name__ == "__main__":
