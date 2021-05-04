@@ -222,8 +222,9 @@ typedef  int  KEY_TYPE;
 /********************/
 /* MPI properties:  */
 /********************/
-int      my_rank,
+int      my_rank, np_total,
          comm_size;
+MPI_Comm comm_work;
 
 
 /********************/
@@ -310,7 +311,7 @@ void c_print_results( char   *name,
                       int    n2,
                       int    n3,
                       int    niter,
-                      int    nprocs_compiled,
+                      int    nprocs_active,
                       int    nprocs_total,
                       double t,
                       double mops,
@@ -581,7 +582,7 @@ void full_verify( void )
                    MP_KEY_TYPE,
                    my_rank-1,
                    1000,
-                   MPI_COMM_WORLD,
+                   comm_work,
                    &request );                   
     if( my_rank < comm_size-1 )
         MPI_Send( &key_array[last_local_key],
@@ -589,7 +590,7 @@ void full_verify( void )
                   MP_KEY_TYPE,
                   my_rank+1,
                   1000,
-                  MPI_COMM_WORLD );
+                  comm_work );
     if( my_rank > 0 )
         MPI_Wait( &request, &status );
 
@@ -697,7 +698,7 @@ void rank( int iteration )
                    NUM_BUCKETS+TEST_ARRAY_SIZE, 
                    MP_KEY_TYPE,
                    MPI_SUM,
-                   MPI_COMM_WORLD );
+                   comm_work );
 
     TIMER_STOP( T_RCOMM );
     TIMER_START( T_RANK );
@@ -760,7 +761,7 @@ void rank( int iteration )
                   recv_count,
                   1,
                   MPI_INT,
-                  MPI_COMM_WORLD );
+                  comm_work );
 
 /*  Determine the receive array displacements for the buckets */    
     recv_displ[0] = 0;
@@ -777,7 +778,7 @@ void rank( int iteration )
                    recv_count,
                    recv_displ,
                    MP_KEY_TYPE,
-                   MPI_COMM_WORLD );
+                   comm_work );
 
     TIMER_STOP( T_RCOMM ); 
     TIMER_START( T_RANK );
@@ -934,7 +935,7 @@ void rank( int iteration )
 int main( int argc, char **argv )
 {
 
-    int             i, iteration, itemp, np;
+    int             i, iteration, itemp, active;
 
     double          timecounter, maxtime;
 
@@ -942,7 +943,64 @@ int main( int argc, char **argv )
 /*  Initialize MPI */
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
-    MPI_Comm_size( MPI_COMM_WORLD, &comm_size );
+    MPI_Comm_size( MPI_COMM_WORLD, &np_total );
+
+
+/*  Check to see whether total number of processes is within bounds.
+    This could in principle be checked in setparams.c, but it is more
+    convenient to do it here                                               */
+    if( np_total < MIN_PROCS || np_total > MAX_PROCS)
+    {
+       if( my_rank == 0 )
+           printf( "\n ERROR: number of processes %d not within range %d-%d"
+                   "\n Exiting program!\n\n", np_total, MIN_PROCS, MAX_PROCS);
+       MPI_Finalize();
+       exit( 1 );
+    }
+
+
+/*  comm_size needs to be power of two */
+    for (comm_size = 1; comm_size < np_total; comm_size *= 2);
+    if (comm_size > np_total) comm_size /= 2;
+
+/*  If the actual number of processes doesn't agree with comm_size,
+    check if excess ranks need to be masked */
+    active = 1;
+    if( comm_size != np_total )
+    {
+        /* check if NPB_NPROCS_STRICT is set */
+        if( my_rank == 0 ) {
+            char *ep = getenv("NPB_NPROCS_STRICT");
+            if (ep && *ep) {
+               if (strchr("nNfF-", *ep) || strcmp(ep, "0") == 0)
+                  active = 0;
+               else if (strcmp(ep, "off") == 0 || strcmp(ep, "OFF") == 0)
+                  active = 0;
+            }
+        }
+        MPI_Bcast(&active, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        /* abort if a strict NPROCS enforcement is required */
+        if (active) {
+            if( my_rank == 0 )
+               printf( "\n ERROR: Number of processes (%d)"
+                       " is not a power of two (%d?)\n"
+                       " Exiting program!\n\n", np_total, comm_size );
+            MPI_Abort(MPI_COMM_WORLD, MPI_ERR_OTHER);
+            exit( 1 );
+        }
+
+        /* mark excess ranks as inactive */
+        active = ( my_rank >= comm_size )? 0 : 1;
+        MPI_Comm_split(MPI_COMM_WORLD, active, my_rank, &comm_work);
+    }
+    else
+        MPI_Comm_dup(MPI_COMM_WORLD, &comm_work);
+
+    if (!active) {
+        MPI_Finalize();
+        exit( 0 );
+    }
 
 
 /*  Initialize the verification arrays if a valid class */
@@ -978,21 +1036,6 @@ int main( int argc, char **argv )
                 test_rank_array[i]  = E_test_rank_array[i];
                 break;
         };
-
-
-/*  comm_size needs to be power of two */
-    for (np = 1; np < comm_size; np *= 2);
-
-/*  Check that actual and compiled number of processors agree */
-    if( comm_size != np )
-    {
-        if( my_rank == 0 )
-            printf( "\n ERROR: Number of processes (%d)"
-                    " is not a power of two (%d?)\n"
-                    " Exiting program!\n\n", comm_size, np/2 );
-        MPI_Finalize();
-        exit( 1 );
-    }
         
 
 /*  Printout initial NPB info */
@@ -1001,25 +1044,15 @@ int main( int argc, char **argv )
         printf( "\n\n NAS Parallel Benchmarks 3.4 -- IS Benchmark\n\n" );
         printf( " Size:  %ld  (class %c)\n", (long)TOTAL_KEYS*MIN_PROCS, CLASS );
         printf( " Iterations:   %d\n", MAX_ITERATIONS );
-        printf( " Number of processes:     %d\n", comm_size );
+        printf( " Total number of processes:  %d\n", np_total );
+        if ( comm_size != np_total )
+            printf( " WARNING: Number of processes"
+                    " is not a power of two (%d active)\n", comm_size );
 
         timeron = check_timer_flag();
     }
 
-
-/*  Check to see whether total number of processes is within bounds.
-    This could in principle be checked in setparams.c, but it is more
-    convenient to do it here                                               */
-    if( comm_size < MIN_PROCS || comm_size > MAX_PROCS)
-    {
-       if( my_rank == 0 )
-           printf( "\n ERROR: number of processes %d not within range %d-%d"
-                   "\n Exiting program!\n\n", comm_size, MIN_PROCS, MAX_PROCS);
-       MPI_Finalize();
-       exit( 1 );
-    }
-
-    MPI_Bcast(&timeron, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&timeron, 1, MPI_INT, 0, comm_work);
 
 #ifdef  TIMING_ENABLED 
     for( i=1; i<=T_LAST; i++ ) timer_clear( i );
@@ -1078,7 +1111,7 @@ int main( int argc, char **argv )
                 MPI_DOUBLE,
                 MPI_MAX,
                 0,
-                MPI_COMM_WORLD );
+                comm_work );
 
 
 /*  This tests that keys are in sequence: sorting of last ranked key seq
@@ -1094,7 +1127,7 @@ int main( int argc, char **argv )
                 MPI_INT,
                 MPI_SUM,
                 0,
-                MPI_COMM_WORLD );
+                comm_work );
 
 
 
@@ -1109,8 +1142,8 @@ int main( int argc, char **argv )
                          MIN_PROCS,
                          0,
                          MAX_ITERATIONS,
-                         np,
                          comm_size,
+                         np_total,
                          maxtime,
                          ((double) (MAX_ITERATIONS)*TOTAL_KEYS*MIN_PROCS)
                                                       /maxtime/1000000.,
@@ -1142,21 +1175,21 @@ int main( int argc, char **argv )
                     MPI_DOUBLE,
                     MPI_MIN,
                     0,
-                    MPI_COMM_WORLD );
+                    comm_work );
         MPI_Reduce( t1,
                     tsum,
                     T_LAST+1,
                     MPI_DOUBLE,
                     MPI_SUM,
                     0,
-                    MPI_COMM_WORLD );
+                    comm_work );
         MPI_Reduce( t1,
                     tmax,
                     T_LAST+1,
                     MPI_DOUBLE,
                     MPI_MAX,
                     0,
-                    MPI_COMM_WORLD );
+                    comm_work );
 
         if( my_rank == 0 )
         {
