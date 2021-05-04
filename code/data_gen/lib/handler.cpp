@@ -15,7 +15,7 @@
 
 sem_t   *mysemp;
 const char semname[] = "mysem";
-const char logname[] = "log-madbench";
+const char logname[] = "ACCESS_LOG";
 
 
 int handle_read(int fd, off_t pos, size_t bytes) {
