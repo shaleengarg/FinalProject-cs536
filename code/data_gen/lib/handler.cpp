@@ -77,7 +77,8 @@ bool write_log(int type, pid_t pid, int fd, off_t offset, size_t bytes){
         return -1;
     }
 
-    fprintf(fp,"%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
+    //fprintf(fp,"%d, PID:%d, FD:%d, OFFSET:%lu, SIZE:%zu\n",
+    fprintf(fp,"%d,%d,%d,%lu,%zu\n",
             type, pid, fd, offset, bytes);
 
     fclose(fp);
